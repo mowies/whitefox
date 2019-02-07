@@ -64,6 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #if !defined(FN1_LOCK_LED_ADDRESS)
 #define FN1_LOCK_LED_ADDRESS 0xA6
 #endif
+
 /* Which LED should breathe during sleep */
 #if !defined(BREATHE_LED_ADDRESS)
 #define BREATHE_LED_ADDRESS CAPS_LOCK_LED_ADDRESS
