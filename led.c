@@ -48,3 +48,30 @@ void led_set(uint8_t usb_led) {
         chSysUnconditionalUnlock();
     }
 }
+
+// this function is used to activate LEDs based on the layer that is set at the moment
+void led_layer_set(uint32_t state) {
+  // Layer 2
+  if((1<<2 & state) != 0)
+  {
+    chSysUnconditionalLock();
+    chMBPostI(&led_mailbox, LED_MSG_LAYER_ZERO);
+    chSysUnconditionalUnlock();
+  }
+  // Layer 1
+  else if((1<<1 & state) != 0)
+  {
+    // signal the LED control thread
+    chSysUnconditionalLock();
+    chMBPostI(&led_mailbox, LED_MSG_LAYER_ONE);
+    chSysUnconditionalUnlock();
+  }
+  // Other layers (0)
+  else
+  {
+    // signal the LED control thread
+    chSysUnconditionalLock();
+    chMBPostI(&led_mailbox, LED_MSG_LAYER_ZERO);
+    chSysUnconditionalUnlock();
+  }
+}

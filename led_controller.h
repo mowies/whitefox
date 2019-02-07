@@ -83,11 +83,14 @@ msg_t is31_read_register(uint8_t page, uint8_t reg, uint8_t *result);
 extern mailbox_t led_mailbox;
 
 // constants for signaling the LED controller thread
-#define LED_MSG_CAPS_ON  1
-#define LED_MSG_CAPS_OFF 2
-#define LED_MSG_SLEEP_LED_ON 3
+#define LED_MSG_CAPS_ON       1
+#define LED_MSG_CAPS_OFF      2
+#define LED_MSG_SLEEP_LED_ON  3
 #define LED_MSG_SLEEP_LED_OFF 4
-#define LED_MSG_ALL_TOGGLE 5
-#define LED_MSG_GAME_TOGGLE 6
+#define LED_MSG_ALL_TOGGLE    5
+#define LED_MSG_GAME_TOGGLE   6
+#define LED_MSG_LAYER_ZERO    7
+#define LED_MSG_LAYER_ONE     8
+#define LED_MSG_LAYER_TWO     9
 
 #endif /* _LED_CONTROLLER_H_ */

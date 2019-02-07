@@ -58,6 +58,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CAPS_LOCK_LED_ADDRESS 0x5B
 #endif
 
+/*
+ * Which LED should be used for Fn1 indicator
+ */
+#if !defined(FN1_LOCK_LED_ADDRESS)
+#define FN1_LOCK_LED_ADDRESS 0xA6
+#endif
 /* Which LED should breathe during sleep */
 #if !defined(BREATHE_LED_ADDRESS)
 #define BREATHE_LED_ADDRESS CAPS_LOCK_LED_ADDRESS
@@ -174,9 +180,9 @@ static THD_FUNCTION(LEDthread, arg) {
         break;
       case LED_MSG_CAPS_OFF:
         // turn caps off on pages 1 and 2
-        is31_write_register(0, CAPS_LOCK_LED_ADDRESS, 0);
-        is31_write_register(1, CAPS_LOCK_LED_ADDRESS, 0);
-        is31_write_register(2, CAPS_LOCK_LED_ADDRESS, 0);
+        is31_write_register(0, CAPS_LOCK_LED_ADDRESS, 0x00);
+        is31_write_register(1, CAPS_LOCK_LED_ADDRESS, 0x00);
+        is31_write_register(2, CAPS_LOCK_LED_ADDRESS, 0x00);
         break;
       case LED_MSG_SLEEP_LED_ON:
         // save current settings
@@ -229,6 +235,18 @@ static THD_FUNCTION(LEDthread, arg) {
           is31_write_register(IS31_FUNCTIONREG, IS31_REG_PICTDISP, 1);
         }
         break;
+      case LED_MSG_LAYER_ONE:
+        // turn on on pages 1 and 2
+        is31_write_register(0, FN1_LOCK_LED_ADDRESS, 0xFF);
+        is31_write_register(1, FN1_LOCK_LED_ADDRESS, 0xFF);
+        is31_write_register(2, FN1_LOCK_LED_ADDRESS, 0xFF);
+        break;
+      case LED_MSG_LAYER_ZERO:
+        // turn off on pages 1 and 2
+        is31_write_register(0, FN1_LOCK_LED_ADDRESS, 0x00);
+        is31_write_register(1, FN1_LOCK_LED_ADDRESS, 0x00);
+        is31_write_register(2, FN1_LOCK_LED_ADDRESS, 0x00);
+        break;
     }
   }
 }
@@ -258,23 +276,23 @@ const uint8_t led_game[83] = {
 /* ALL LEDs */
 const uint8_t led_all[83] = {
   0x24,
-  0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
   0x34,
-  0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
   0x44,
-  0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
   0x54,
-  0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
   0x64,
-  0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
   0x74,
-  0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
   0x84,
-  0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
   0x94,
-  0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
   0xA4,
-  0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
+  0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 };
 
 /* =============
@@ -308,8 +326,8 @@ void hook_early_init(void) {
 
   /* enable breathing when the displayed page changes */
   // Fade-in Fade-out, time = 26ms * 2^N, N=3
-  is31_write_register(IS31_FUNCTIONREG, IS31_REG_BREATHCTRL1, (3<<4)|3);
-  is31_write_register(IS31_FUNCTIONREG, IS31_REG_BREATHCTRL2, IS31_REG_BREATHCTRL2_ENABLE|3);
+  is31_write_register(IS31_FUNCTIONREG, IS31_REG_BREATHCTRL1, (3<<4)|2);
+  is31_write_register(IS31_FUNCTIONREG, IS31_REG_BREATHCTRL2, IS31_REG_BREATHCTRL2_ENABLE|2);
 
   /* Write pages */
   for(i=0; i<9; i++) {
@@ -320,8 +338,15 @@ void hook_early_init(void) {
   }
 
   // clean up the capslock LED
+  is31_write_register(0, CAPS_LOCK_LED_ADDRESS, 0);
   is31_write_register(1, CAPS_LOCK_LED_ADDRESS, 0);
   is31_write_register(2, CAPS_LOCK_LED_ADDRESS, 0);
+
+  // clean up the Fn LED
+  is31_write_register(0, FN1_LOCK_LED_ADDRESS, 0);
+  is31_write_register(1, FN1_LOCK_LED_ADDRESS, 0);
+  is31_write_register(2, FN1_LOCK_LED_ADDRESS, 0);
+
 
   /* more time consuming LED processing should be offloaded into
    * a thread, with asynchronous messaging. */
