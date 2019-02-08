@@ -1,6 +1,6 @@
 [submodule "tmk_core"]
 	path = tmk_core
-	url = https://github.com/mowies/tmk_core.git
+	url = git@github.com:mowies/tmk_core.git
 [submodule "chibios"]
 	path = chibios
 	url = https://github.com/ChibiOS/ChibiOS
